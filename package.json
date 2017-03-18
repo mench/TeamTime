@@ -1,0 +1,37 @@
+{
+  "name": "TeamTime",
+  "main": "out/system.js",
+  "types": "out/system.d.ts",
+  "version": "1.0.0",
+  "author": "Armen Harutyunyan <mench.harutyunyan@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "start-local": "NODE_ENV=local ./node_modules/.bin/electron ./app.js",
+    "start": "NODE_ENV=production ./node_modules/.bin/electron ./app.js"
+  },
+  "dependencies": {
+    "@types/material-ui": "^0.16.57",
+    "@types/react": "^15.0.16",
+    "@types/react-dom": "^0.14.23",
+    "@types/react-swipeable-views": "0.0.27",
+    "@types/react-tap-event-plugin": "0.0.30",
+    "@types/winston": "^2.2.0",
+    "dependency-injection.ts": "^1.0.2",
+    "ecmamodel.ts": "^1.0.6",
+    "material-ui": "^0.17.1",
+    "material-ui-datatables": "^0.16.7",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-swipeable-views": "^0.11.1",
+    "react-tap-event-plugin": "^2.0.1",
+    "sqlite3": "^3.1.8",
+    "squel": "^5.8.0",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "electron": "1.6.2",
+    "electron-builder": "^14.5.2"
+  },
+  "description": "TeamTime Soft"
+}
