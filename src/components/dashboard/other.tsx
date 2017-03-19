@@ -96,12 +96,13 @@ export class Other extends Component<any,any>{
         return new Customers();
     }
     public componentDidMount(){
+        console.info("componentDidMount")
         this.collection.on('reset',this.handleReset);
         this.load(this.state.page);
     }
     @Bound
     public ready(total){
-        this.setState({
+        let state = {
             ready : true,
             total:total,
             fields  : {
@@ -110,19 +111,25 @@ export class Other extends Component<any,any>{
                 note:""
             },
             data : this.collection
-                .toJSON()
-                .map((model:any)=>{
-                    if( model.created_at ){
-                        model.created_at = new Date(model.created_at)
-                            .toString()
-                            .replace(/GMT(.*)/g,"")
-                    }
-                    Object.defineProperty(model,'action',{
+                .map((model:Customer)=>{
+                    let object:any = model.toObject();
+                    Object.defineProperty(object,'action',{
                         value :  <RaisedButton label="FINISH" secondary={true} />
                     });
-                    return model;
+                    Object.defineProperty(object,'created_at',{
+                        value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
+                    });
+                    return object;
                 })
-        })
+        };
+        if ( !this.state.ready ){
+            this.state.ready = true;
+            setTimeout(()=>{
+                this.setState(state);
+            },400);
+        }else {
+            this.setState(state);
+        }
     }
     @Bound
     public handleReset(){

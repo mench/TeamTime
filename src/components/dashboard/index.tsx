@@ -13,6 +13,11 @@ import {Alert} from "../helpers/alert";
 import {Tabs, Tab} from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
 import {Other} from "./other";
+import {Mafia} from "./mafia";
+import {Club} from "./club";
+import {Event} from "./event";
+import {Package} from "./package";
+import {CATEGORIES} from "../../api/helpers/categories";
 
 const {DataTables} =  require('material-ui-datatables');
 
@@ -70,7 +75,7 @@ export class Dashboard extends Component<any,any>{
 
     }
 
-    render(){
+    public render(){
         return (
             <Card style={{margin: 40, textAlign: 'left'}}>
                 <CardHeader
@@ -86,26 +91,51 @@ export class Dashboard extends Component<any,any>{
                         <Tab label="Mafia" value={1} />
                         <Tab label="Event" value={2} />
                         <Tab label="Club" value={3} />
-                        <Tab label="Patet" value={4} />
+                        <Tab label="Package" value={4} />
                     </Tabs>
                     <SwipeableViews
                         index={this.state.slideIndex}
                         onChangeIndex={this.handleChangeTab}
                     >
                         <div>
-                            <Other onError={this.handleError}  />
+                            {(()=>{
+                                if( this.state.slideIndex == CATEGORIES.OTHER ){
+                                    return  <Other onError={this.handleError}  />
+                                }
+                                return <div></div>
+                            })()}
                         </div>
                         <div >
-
+                            {(()=>{
+                                if( this.state.slideIndex == CATEGORIES.MAFIA ){
+                                    return  <Mafia onError={this.handleError}  />
+                                }
+                                return <div></div>
+                            })()}
                         </div>
                         <div >
-
+                            {(()=>{
+                                if( this.state.slideIndex == CATEGORIES.EVENT ){
+                                    return  <Event onError={this.handleError}  />
+                                }
+                                return <div></div>
+                            })()}
                         </div>
                         <div>
-
+                            {(()=>{
+                                if( this.state.slideIndex == CATEGORIES.CLUB ){
+                                    return  <Club onError={this.handleError}  />
+                                }
+                                return <div></div>
+                            })()}
                         </div>
                         <div>
-
+                            {(()=>{
+                                if( this.state.slideIndex == CATEGORIES.PACKAGE ){
+                                    return  <Package onError={this.handleError}  />
+                                }
+                                return <div></div>
+                            })()}
                         </div>
                     </SwipeableViews>
                 </div>

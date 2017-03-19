@@ -2,6 +2,13 @@ import {Field,Id} from 'ecmamodel.ts';
 import {Model} from "./base/model";
 import {SCHEMA}  from 'ecmamodel.ts/lib/field';
 import {Cached} from "../../utils/cached";
+import {Other} from "../helpers/calculations/other";
+import {Mafia} from "../helpers/calculations/mafia";
+import {Club} from "../helpers/calculations/club";
+import {Event} from "../helpers/calculations/event";
+import {Package} from "../helpers/calculations/package";
+import {CATEGORIES} from "../helpers/categories";
+
 export class Customer extends Model {
 
     @Id
@@ -36,10 +43,10 @@ export class Customer extends Model {
 
     @Field({
         type:String,
-        enum:['Mafia','Other','Event','Club','Patet'],
+        enum:['Mafia','Other','Event','Club','Package'],
         default:'Other'
     })
-    public category:number;
+    public category:string;
 
     @Field({
         type:Boolean,
@@ -72,5 +79,30 @@ export class Customer extends Model {
     public save(options?){
         this.set('updated_at',Date.now());
         return super.save(options);
+    }
+    @Cached
+    public get calculator(){
+        switch (CATEGORIES[this.category.toUpperCase()]){
+            case CATEGORIES.MAFIA :
+                return new Mafia();
+            case CATEGORIES.EVENT :
+                return new Event();
+            case CATEGORIES.CLUB :
+                return new Club();
+            case CATEGORIES.PACKAGE :
+                return new Package();
+            default :
+                return new Other();
+        }
+    }
+    public toObject(){
+        let model = this.toJSON();
+        if( model.created_at && !this.finished){
+            model.created_at = new Date(model.created_at)
+                .toString()
+                .replace(/GMT(.*)/g,"");
+            model.price = this.calculator.price(this.created_at);
+        }
+        return model;
     }
 }
