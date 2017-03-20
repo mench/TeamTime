@@ -32,10 +32,12 @@ export class Other extends Component<any,any>{
         page    : 1,
         rowSize : 30,
         ready : false,
+        openDialog:false,
         fields  : {
             code:"",
             name:"",
-            note:""
+            note:"",
+            category:this.categoryName
         }
     };
     @Bound
@@ -47,7 +49,9 @@ export class Other extends Component<any,any>{
     @Bound
     public async onSubmit(e){
         e.preventDefault();
+        this.state.fields.category = this.categoryName;
         let model:Customer = new Customer(this.state.fields);
+        console.info(model.created_at)
         let exist = await this.collection.fetchByCode(model.code);
         if ( exist ){
             return this.handleError([
@@ -101,10 +105,10 @@ export class Other extends Component<any,any>{
         this.load(this.state.page);
     }
     @Bound
-    public ready(total){
+    public ready(res){
         let state = {
             ready : true,
-            total:total,
+            total:res.total,
             fields  : {
                 code:"",
                 name:"",
@@ -134,8 +138,11 @@ export class Other extends Component<any,any>{
     @Bound
     public handleReset(){
         this.collection
-            .total()
-            .then(this.ready);
+            .select(sql
+                .select()
+                .field("count(*) as total")
+                .where('category = ?',this.categoryName)
+            ).then(this.ready);
     }
     @Cached
     private get log():Log {
@@ -144,7 +151,7 @@ export class Other extends Component<any,any>{
     public load(page = 1,order = this.order,direction = this.direction){
         this.order = order;
         this.direction = direction;
-        let offset =  ((page - 1) * this.state.rowSize + 1);
+        let offset =  ((page - 1) * this.state.rowSize);
         this.collection.fetch(sql
             .select()
             .where('category = ?',this.categoryName)
@@ -232,7 +239,7 @@ export class Other extends Component<any,any>{
                                     {
                                         key: 'price',
                                         label: 'PRICE',
-                                        sortable:true
+                                        sortable:false
                                     },
                                     {
                                         key: 'note',

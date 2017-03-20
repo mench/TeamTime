@@ -6,12 +6,11 @@ import {DatabaseService} from "../../services/database";
 import {Model} from "./model";
 
 export interface SqlTrait {
-    total():Promise<any>;
     tableName:string;
 }
 
 export class Collection extends EcmaCollection implements SqlTrait{
-    public tableName: string = "customers";
+    public tableName: string;
 
     constructor(type: Model | any){
         super(type);
@@ -21,11 +20,10 @@ export class Collection extends EcmaCollection implements SqlTrait{
         return System.app.database;
     }
     public get sync():DbAdapter{
-        return new DbAdapter(this);
+        return new DbAdapter(this,this.tableName);
     }
-    public async total():Promise<any>{
-        return this.db
-            .count();
+    public select(sql):Promise<any>{
+        return this.db.store.get(sql.from(this.tableName).toString());
     }
     public async fetch(sql):Promise<false | this>{
         let res = await this.db.store.all(

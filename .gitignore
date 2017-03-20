@@ -9,3 +9,4 @@ node_modules
 *.ipr
 *.iws
 out
+data/team_time.sqlite

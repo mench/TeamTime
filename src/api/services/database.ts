@@ -6,8 +6,7 @@ import {Config} from "../../config/index";
 import sqlite from '../libs/sqlite';
 
 @singleton
-export abstract class DatabaseService extends Service {
-    protected abstract tableName:string;
+export class DatabaseService extends Service {
     @inject
     private config:Config;
     public connect():Promise<Database>{
@@ -22,15 +21,7 @@ export abstract class DatabaseService extends Service {
         this.store =  await this.connect();
         return this;
     }
-    public async findById(id){
-        return await this.store.get(`SELECT * FROM ${this.tableName} WHERE id = ?`,id);
-    }
-    public table(tableName:string){
-        this.tableName = tableName;
-        return this;
-    }
-    public async count(){
-        let result:{total:number} = await this.store.get(`SELECT COUNT(*) as total FROM ${this.tableName}`);
-        return result.total;
+    public async get(sql:string){
+        return await this.store.get(sql);
     }
 }

@@ -11,7 +11,6 @@ import {View} from "./components/view";
 import LocalConfig from './config/local';
 import ProdConfig from './config/prod';
 import {DatabaseService} from "./api/services/database";
-import {CustomerService} from "./api/services/customers";
 import {Promises} from "./utils/promises";
 
 @singleton
@@ -28,7 +27,6 @@ export class System {
                 container.bind(Config,ProdConfig);
                 break;
         }
-        container.bind(DatabaseService,CustomerService);
         return container
             .getInstanceOf(System);
     }

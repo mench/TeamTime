@@ -8,9 +8,16 @@ import {Club} from "../helpers/calculations/club";
 import {Event} from "../helpers/calculations/event";
 import {Package} from "../helpers/calculations/package";
 import {CATEGORIES} from "../helpers/categories";
+import {DbAdapter} from "../database/sync";
 
 export class Customer extends Model {
-
+    constructor(data?){
+        super(data);
+        if( this.isNew ){
+            this.created_at = new Date();
+            this.updated_at = new Date();
+        }
+    }
     @Id
     @Field({
         type:Number
@@ -55,20 +62,17 @@ export class Customer extends Model {
     public finished:boolean;
 
     @Field({
-        type:Date,
-        default:Date.now()
+        type:Date
     })
     public created_at:Date;
 
     @Field({
-        type:Date,
-        default:Date.now()
+        type:Date
     })
     public updated_at:Date;
 
     @Field({
-        type:Date,
-        default:Date.now()
+        type:Date
     })
     public finished_at:Date;
 
@@ -94,6 +98,9 @@ export class Customer extends Model {
             default :
                 return new Other();
         }
+    }
+    protected get sync():DbAdapter{
+        return new DbAdapter(this,'customers');
     }
     public toObject(){
         let model = this.toJSON();
