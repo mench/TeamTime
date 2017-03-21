@@ -11,13 +11,7 @@ import {CATEGORIES} from "../helpers/categories";
 import {DbAdapter} from "../database/sync";
 
 export class Customer extends Model {
-    constructor(data?){
-        super(data);
-        if( this.isNew ){
-            this.created_at = new Date();
-            this.updated_at = new Date();
-        }
-    }
+
     @Id
     @Field({
         type:Number
@@ -64,16 +58,6 @@ export class Customer extends Model {
     @Field({
         type:Date
     })
-    public created_at:Date;
-
-    @Field({
-        type:Date
-    })
-    public updated_at:Date;
-
-    @Field({
-        type:Date
-    })
     public finished_at:Date;
 
     @Cached
@@ -99,6 +83,7 @@ export class Customer extends Model {
                 return new Other();
         }
     }
+    @Cached
     protected get sync():DbAdapter{
         return new DbAdapter(this,'customers');
     }
@@ -111,5 +96,9 @@ export class Customer extends Model {
             model.price = this.calculator.price(this.created_at);
         }
         return model;
+    }
+
+    public getShortCreatedAt(){
+        return this.created_at.toLocaleDateString([],{month:'2-digit',day:'2-digit'}) + ' '+ this.created_at.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
 }

@@ -20,7 +20,7 @@ export class DbAdapter extends SyncHttp {
         let res = await store.run.apply(store,[
             (`INSERT INTO ${this.tableName} (${Object.keys(entity).join(',')}) VALUES(${Object.keys(entity).map(v=>'?').join(',')})`)
         ].concat(Object.keys(entity).map(k=>entity[k]))).catch(e=>{
-            console.info(e)
+            System.app.log.error(e);
         });
         return await this.db.get(sql
             .select()
@@ -38,29 +38,32 @@ export class DbAdapter extends SyncHttp {
                 .toString()
             );
     }
-    // public update():Promise<any>{
-    //     return new Promise((resolve,reject)=>{
-    //         this.db.update({_id:this.entity.get('id')},this.entity.toJSON(),(err,doc)=>{
-    //             if( err ) return reject(err);
-    //             resolve(doc);
-    //         });
-    //     });
-    // }
-    // public delete():Promise<any>{
-    //     return new Promise((resolve,reject)=>{
-    //         this.db.remove({_id:this.entity.get('id')},(err,doc)=>{
-    //             if( err ) return reject(err);
-    //             resolve(doc);
-    //         });
-    //     });
-    // }
-    //
-    // public count():Promise<any>{
-    //     return new Promise((resolve,reject)=>{
-    //         this.db.count({},(err,count)=>{
-    //             if( err ) return reject(err);
-    //             resolve(count);
-    //         });
-    //     });
-    // }
+    public async update():Promise<any>{
+        let {store} = this.db;
+        let entity = this.entity.toJSON();
+        var id = entity.id;
+        delete entity.id;
+        return await store.run.apply(store,[
+            (`UPDATE ${this.tableName} SET ${Object.keys(entity).map(k=>`${k} = ?`).join(',')} WHERE id=?`)
+        ].concat(Object.keys(entity).map(k=>entity[k])).concat([id])).catch(e=>{
+            System.app.log.error(e);
+        }).then(r=>{
+            return this.entity.toJSON();
+        });
+    }
+    public async delete():Promise<any>{
+        let {store} = this.db;
+        return await store.run(
+            sql.delete()
+                .from(this.tableName)
+                .where('id = ?',this.entity.getId())
+                .toString()
+        ).then(r=>{
+            return this.entity.toJSON()
+        }).catch(e=>{
+            System.app.log.error(e);
+            return this.entity.toJSON()
+        });
+    }
+
 }

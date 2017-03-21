@@ -8,7 +8,7 @@ import {lightBlue500} from 'material-ui/styles/colors';
 import {red500} from 'material-ui/styles/colors';
 import {Customer} from "../../api/models/customer";
 import {Cached} from "../../utils/cached";
-import {Customers} from "../../api/models/customers";
+import {CustomerCollection} from "../../api/models/customers";
 import {Tabs, Tab} from 'material-ui/Tabs';
 import CircularProgress from 'material-ui/CircularProgress';
 import {sql} from "../../api/database/sql";
@@ -32,7 +32,6 @@ export class Other extends Component<any,any>{
         page    : 1,
         rowSize : 30,
         ready : false,
-        openDialog:false,
         fields  : {
             code:"",
             name:"",
@@ -44,14 +43,15 @@ export class Other extends Component<any,any>{
     public handleError(e){
         if(Array.isArray(e)){
             this.props.onError(e);
+        }else{
+            System.app.log.error(e);
         }
     }
-    @Bound
+
     public async onSubmit(e){
         e.preventDefault();
         this.state.fields.category = this.categoryName;
         let model:Customer = new Customer(this.state.fields);
-        console.info(model.created_at)
         let exist = await this.collection.fetchByCode(model.code);
         if ( exist ){
             return this.handleError([
@@ -97,11 +97,10 @@ export class Other extends Component<any,any>{
     }
     @Cached
     public get collection(){
-        return new Customers();
+        return new CustomerCollection();
     }
     public componentDidMount(){
-        console.info("componentDidMount")
-        this.collection.on('reset',this.handleReset);
+        this.collection.on('reset',this.handleReset.bind(this));
         this.load(this.state.page);
     }
     @Bound
@@ -115,16 +114,7 @@ export class Other extends Component<any,any>{
                 note:""
             },
             data : this.collection
-                .map((model:Customer)=>{
-                    let object:any = model.toObject();
-                    Object.defineProperty(object,'action',{
-                        value :  <RaisedButton label="FINISH" secondary={true} />
-                    });
-                    Object.defineProperty(object,'created_at',{
-                        value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
-                    });
-                    return object;
-                })
+                .map(this.appendItem.bind(this))
         };
         if ( !this.state.ready ){
             this.state.ready = true;
@@ -135,7 +125,18 @@ export class Other extends Component<any,any>{
             this.setState(state);
         }
     }
-    @Bound
+
+    public appendItem(model:Customer){
+        let object:any = model.toObject();
+        Object.defineProperty(object,'action',{
+            value :  <RaisedButton label="FINISH" secondary={true} />
+        });
+        Object.defineProperty(object,'created_at',{
+            value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
+        });
+        return object;
+    }
+
     public handleReset(){
         this.collection
             .select(sql
@@ -185,7 +186,7 @@ export class Other extends Component<any,any>{
         return (
             <Card style={{textAlign:'center',overflow:'hidden'}}>
                 <CardText>
-                    <form onSubmit={this.onSubmit} >
+                    <form onSubmit={this.onSubmit.bind(this)} >
                         <TextField
                             style={{width:'15%',marginLeft:'2%',}}
                             hintText="Code"

@@ -8,14 +8,13 @@ import {lightBlue500} from 'material-ui/styles/colors';
 import {red500} from 'material-ui/styles/colors';
 import {Customer} from "../../api/models/customer";
 import {Cached} from "../../utils/cached";
-import {Customers} from "../../api/models/customers";
 import {Alert} from "../helpers/alert";
 import {Tabs, Tab} from 'material-ui/Tabs';
 import SwipeableViews from 'react-swipeable-views';
 import {Other} from "./other";
 import {Mafia} from "./mafia";
 import {Club} from "./club";
-import {Event} from "./event";
+import {Events} from "./event";
 import {Package} from "./package";
 import {CATEGORIES} from "../../api/helpers/categories";
 
@@ -116,7 +115,7 @@ export class Dashboard extends Component<any,any>{
                         <div >
                             {(()=>{
                                 if( this.state.slideIndex == CATEGORIES.EVENT ){
-                                    return  <Event onError={this.handleError}  />
+                                    return  <Events onError={this.handleError}  />
                                 }
                                 return <div></div>
                             })()}

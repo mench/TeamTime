@@ -2,7 +2,7 @@ import {Collection} from "./base/collection";
 import {Customer} from "./customer";
 import {sql} from "../database/sql";
 
-export class Customers extends Collection {
+export class CustomerCollection extends Collection {
     public tableName: string = "customers";
     constructor(){
         super(Customer);
