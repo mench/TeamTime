@@ -8,10 +8,12 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import DashboardIcon from 'material-ui/svg-icons/action/dashboard';
 import HistoryIcon from 'material-ui/svg-icons/action/history';
+import SettingsIcon from 'material-ui/svg-icons/action/settings';
 import * as injectTapEventPlugin from 'react-tap-event-plugin';
 import {Bound} from "../utils/bound";
 import {Dashboard} from "./dashboard";
 import {Report} from "./report";
+import {Settings} from "./settings/index";
 
 injectTapEventPlugin();
 
@@ -21,8 +23,9 @@ const muiTheme = getMuiTheme({
     }
 });
 const WINDOWS = {
-    DASHBOARD   : 'Dashboard',
-    REPORT      : 'Report'
+    DASHBOARD       : 'Dashboard',
+    REPORT          : 'Report',
+    SETTINGS        : 'Settings'
 };
 
 export class App extends Component<any,any>{
@@ -51,6 +54,10 @@ export class App extends Component<any,any>{
     openReport(){
         this.openWindow(WINDOWS.REPORT);
     }
+    @Bound
+    openSettings(){
+        this.openWindow(WINDOWS.SETTINGS);
+    }
     private openWindow(window){
         this.setState({
             window:window,
@@ -65,6 +72,7 @@ export class App extends Component<any,any>{
                     <Drawer open={this.state.isOpenMenu} docked={false} onRequestChange={this.handleCloseDrawer} >
                         <MenuItem onTouchTap={this.openDashboard} leftIcon={<DashboardIcon />} >Dashboard</MenuItem>
                         <MenuItem onTouchTap={this.openReport} leftIcon={<HistoryIcon />} >Reports</MenuItem>
+                        <MenuItem onTouchTap={this.openSettings} leftIcon={<SettingsIcon />} >Settings</MenuItem>
                     </Drawer>
                     {
                         (()=>{
@@ -73,6 +81,8 @@ export class App extends Component<any,any>{
                                     return <Dashboard />
                                 case WINDOWS.REPORT :
                                     return <Report />
+                                case WINDOWS.SETTINGS :
+                                    return <Settings />
                             }
                         })()
                     }

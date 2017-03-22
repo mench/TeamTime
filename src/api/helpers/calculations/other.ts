@@ -1,6 +1,8 @@
-export class Other {
-    protected minimum:number = 300;
-    protected oneHour:number = 600;
+import {Calculator} from "./calculator";
+
+export class Other extends Calculator{
+    protected minimum:number = this.settings.data.other.minimum;
+    protected oneHour:number = this.settings.data.other.oneHour;
     public static toMinutes(millis:number){
         return Math.floor(millis / 60000);
     }

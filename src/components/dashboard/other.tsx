@@ -14,6 +14,8 @@ import CircularProgress from 'material-ui/CircularProgress';
 import {sql} from "../../api/database/sql";
 import {System} from "../../system";
 import {Log} from "../../helpers/logger";
+import EditIcon from 'material-ui/svg-icons/image/edit';
+import {prompt} from "../helpers/prompt";
 
 const {DataTables} =  require('material-ui-datatables');
 
@@ -32,6 +34,7 @@ export class Other extends Component<any,any>{
         page    : 1,
         rowSize : 30,
         ready : false,
+        editNote : false,
         fields  : {
             code:"",
             name:"",
@@ -101,6 +104,11 @@ export class Other extends Component<any,any>{
     }
     public componentDidMount(){
         this.collection.on('reset',this.handleReset.bind(this));
+        this.collection.on('change',()=>{
+            this.setState({
+                data : this.collection.map(this.appendItem.bind(this))
+            });
+        });
         this.load(this.state.page);
     }
     @Bound
@@ -126,13 +134,26 @@ export class Other extends Component<any,any>{
         }
     }
 
+    handleEditNote (id,value){
+        let _id = id;
+        prompt(value).then(val=>{
+            let model = this.collection.get(_id);
+            model.set('note',val);
+            model.save();
+        },r=>{});
+    };
+
     public appendItem(model:Customer){
         let object:any = model.toObject();
+
         Object.defineProperty(object,'action',{
             value :  <RaisedButton label="FINISH" secondary={true} />
         });
         Object.defineProperty(object,'created_at',{
             value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
+        });
+        Object.defineProperty(object,'note',{
+            value :<span>{object.note} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={this.handleEditNote.bind(this,object.id,object.note)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
         });
         return object;
     }

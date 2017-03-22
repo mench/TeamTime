@@ -27,6 +27,8 @@ import {Objects} from "../../utils/objects";
 import {System} from "../../system";
 import {Customer} from "../../api/models/customer";
 import {Relation} from "../../api/models/relation";
+import {confirm} from "../helpers/confirm";
+import EditIcon from 'material-ui/svg-icons/image/edit';
 
 
 let SelectableList:any = makeSelectable(List);
@@ -60,6 +62,11 @@ export class Events extends Component<any,any> {
         }else {
             System.app.log.error(e);
         }
+    }
+    @Bound
+    public handleDestroy(){
+        this.state.currentEvent = null;
+        this.collection.emit('reset');
     }
     @Bound
     public handleCloseDialog () {
@@ -180,7 +187,7 @@ export class Events extends Component<any,any> {
                     {
                         (()=>{
                             if( this.state.currentEvent ){
-                                return <Event key={this.state.currentEvent.getId()} data={this.state.currentEvent} onError={this.handleError} />
+                                return <Event key={this.state.currentEvent.getId()} data={this.state.currentEvent} onDestroy={this.handleDestroy} onError={this.handleError} />
                             }
                             return <div></div>
                         })()
@@ -196,6 +203,7 @@ export class Event extends Other{
     protected categoryName = 'Event';
     public static defaultProps = {
         onError : ()=>{},
+        onDestroy : ()=>{},
         data : new EventModel()
     };
     @Bound
@@ -224,7 +232,21 @@ export class Event extends Other{
             })
             .catch(this.handleError)
     }
+    @Bound
+    public handleDeleteEvent(){
+        let event:EventModel = this.props.data;
+        if( this.collection.length ){
+            confirm('Are you sure you wont to delete this event. There are unfinished items. All unfinished Customers will be removed').then(ok=> {
+                    event.once('destroy',this.props.onDestroy);
+                    event.destroy();
+                },r=>{}
+            );
+        }else {
+            event.once('destroy',this.props.onDestroy);
+            event.destroy();
+        }
 
+    }
     public handleReset(){
         this.collection.tableName = 'relations';
         this.collection
@@ -256,11 +278,15 @@ export class Event extends Other{
         Object.defineProperty(object,'action',{
             value :  <RaisedButton label="FINISH" secondary={true} />
         });
+        Object.defineProperty(object,'note',{
+            value :<span>{object.note} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={this.handleEditNote.bind(this,object.id,object.note)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+        });
         Object.defineProperty(object,'created_at',{
             value :  <span style={{fontSize:11}}><b>{model.getShortCreatedAt()}</b></span>
         });
         return object;
     }
+
     public render(){
         return (
             <Card style={{overflow:'hidden'}}>
@@ -289,6 +315,7 @@ export class Event extends Other{
                             label="Delete Event"
                             labelPosition="before"
                             primary={true}
+                            onClick = {this.handleDeleteEvent}
                             icon={<ActionDelete />}
                             style={{marginLeft:'2%'}}
                         />

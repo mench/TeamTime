@@ -41,6 +41,8 @@ export class DbAdapter extends SyncHttp {
     public async update():Promise<any>{
         let {store} = this.db;
         let entity = this.entity.toJSON();
+        delete entity.created_at;
+        entity.updated_at = Date.now();
         var id = entity.id;
         delete entity.id;
         return await store.run.apply(store,[

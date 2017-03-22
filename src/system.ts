@@ -12,6 +12,7 @@ import LocalConfig from './config/local';
 import ProdConfig from './config/prod';
 import {DatabaseService} from "./api/services/database";
 import {Promises} from "./utils/promises";
+import {SettingsService} from "./api/services/settings";
 
 @singleton
 export class System {
@@ -46,6 +47,8 @@ export class System {
     public view:View;
     @inject
     public database:DatabaseService;
+    @inject
+    public settings:SettingsService;
 
     public start(){
         this.log.info("System Starting");
@@ -59,7 +62,6 @@ export class System {
         }).catch(e=>{
             this.log.error("System Rejected",e);
         });
-
     }
 }
 System.app.start();

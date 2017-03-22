@@ -1,0 +1,37 @@
+{
+  "other":{
+    "minimum":300,
+    "oneHour":600
+  },
+  "club":{
+    "oneHour":1000
+  },
+  "mafia":{
+    "THURSDAY":{
+      "start_time": {
+        "hours"   : 19,
+        "minutes" : 0
+      } ,
+      "end_time":{
+        "hours"   : 22,
+        "minutes" : 0
+      },
+      "totalPrice":1000
+    },
+    "SUNDAY":{
+      "start_time":{
+        "hours"   : 18,
+        "minutes" : 0
+      } ,
+      "end_time":{
+        "hours"   : 21,
+        "minutes" : 0
+      },
+      "totalPrice":1000
+    }
+  },
+  "package":{
+    "totalPrice":1500,
+    "finish_hour":4
+  }
+}
