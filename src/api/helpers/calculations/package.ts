@@ -9,7 +9,7 @@ export class Package extends Other{
         if( Date.now() <= end_time ){
             return this.totalPrice;
         }
-        return this.totalPrice + super.price(new Date(end_time));
+        return this.totalPrice + super.price(new Date(end_time),true);
     }
 
 }

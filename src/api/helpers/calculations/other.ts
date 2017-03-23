@@ -7,9 +7,9 @@ export class Other extends Calculator{
         return Math.floor(millis / 60000);
     }
 
-    public price(created_at:Date):number{
+    public price(created_at:Date,ignore=false):number{
         let price = this.oneHour/60;
         let currentPrice = Math.round(Other.toMinutes( Date.now() - created_at.getTime())*price);
-        return currentPrice > this.minimum ? currentPrice : this.minimum;
+        return (currentPrice < this.minimum && !ignore) ? this.minimum : currentPrice;
     }
 }

@@ -10,15 +10,16 @@ const data = require('../../../data/settings.json');
 @singleton
 export class SettingsService extends Emitter {
     public data:any = data;
-    public write():Promise<boolean>{
-        this.emit('change',this,data);
+    public write(data?):Promise<boolean>{
+        this.data = data;
+        this.emit('change',this,this.data);
         return new Promise((resolve,reject)=>{
-            fs.writeFile(path.join(__dirname,'../../../data/settings.json'), JSON.stringify(this.data), 'utf8', function (err) {
+            fs.writeFile(path.join(__dirname,'../../../data/settings.json'), JSON.stringify(this.data), 'utf8',  (err)=> {
                 if( err ){
                     this.emit('error',this,err);
                     return reject(err);
                 }
-                this.emit('rewrite',this,data);
+                this.emit('rewrite',this,this.data);
                 resolve(true)
             });
         });

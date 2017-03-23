@@ -6,6 +6,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import {lightBlue500} from 'material-ui/styles/colors';
 import {red500} from 'material-ui/styles/colors';
+import {green500} from 'material-ui/styles/colors';
 import {Customer} from "../../api/models/customer";
 import {Cached} from "../../utils/cached";
 import {CustomerCollection} from "../../api/models/customers";
@@ -16,6 +17,7 @@ import {System} from "../../system";
 import {Log} from "../../helpers/logger";
 import EditIcon from 'material-ui/svg-icons/image/edit';
 import {prompt} from "../helpers/prompt";
+import {confirm} from "../helpers/confirm";
 
 const {DataTables} =  require('material-ui-datatables');
 
@@ -90,10 +92,7 @@ export class Other extends Component<any,any>{
             fields:this.state.fields
         })
     }
-    @Bound
-    public handleFilterValueChange(){
-        console.info('handleFilterValueChange')
-    }
+
     @Bound
     public handleSortOrderChange(order,direction:string){
         this.load(this.state.page,order,direction.toLowerCase() != 'desc');
@@ -143,17 +142,37 @@ export class Other extends Component<any,any>{
         },r=>{});
     };
 
+    public handleFinish(model:Customer){
+        let price = model.getPrice();
+        confirm(<span><span>Total price is</span><h2>{price}<span style={{fontSize:12}}>&nbsp;AMD</span></h2></span>,{success:true})
+            .then(r=>{
+                this.finished(price,model);
+            },e=>{});
+    }
+    public finished(price:number,model:Customer){
+        this.collection.remove(model);
+        model.set({
+            price:price,
+            finished_at:Date.now(),
+            finished : true
+        }).save().then(r=>{
+            this.log.info('FINISHED',model.id,model.code);
+            this.load(this.state.page);
+        }).catch(this.log.error);
+    }
+
     public appendItem(model:Customer){
         let object:any = model.toObject();
 
         Object.defineProperty(object,'action',{
-            value :  <RaisedButton label="FINISH" secondary={true} />
+            value :  <RaisedButton label="FINISH" onTouchTap={()=>this.handleFinish(model)} secondary={true} />
         });
         Object.defineProperty(object,'created_at',{
             value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
         });
+        var note = object.note;
         Object.defineProperty(object,'note',{
-            value :<span>{object.note} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={this.handleEditNote.bind(this,object.id,object.note)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+            value :<span>{object.note} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditNote(object.id,note)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
         });
         return object;
     }
@@ -164,10 +183,11 @@ export class Other extends Component<any,any>{
                 .select()
                 .field("count(*) as total")
                 .where('category = ?',this.categoryName)
+                .where('finished = 0')
             ).then(this.ready);
     }
     @Cached
-    private get log():Log {
+    public get log():Log {
         return System.app.log;
     }
     public load(page = 1,order = this.order,direction = this.direction){
@@ -177,6 +197,7 @@ export class Other extends Component<any,any>{
         this.collection.fetch(sql
             .select()
             .where('category = ?',this.categoryName)
+            .where('finished = 0')
             .offset(offset)
             .order(this.order,this.direction)
             .limit(this.state.rowSize)
@@ -276,7 +297,6 @@ export class Other extends Component<any,any>{
                                 ]}
                                 data={this.state.data}
                                 showCheckboxes={false}
-                                onFilterValueChange={this.handleFilterValueChange}
                                 onSortOrderChange={this.handleSortOrderChange}
                                 onNextPageClick = {this.handleNextPage}
                                 onPreviousPageClick = {this.handlePreviousPage}

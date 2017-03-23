@@ -4,6 +4,7 @@ import {sql} from "../database/sql";
 import {Bound} from "../../utils/bound";
 import {System} from "../../system";
 import {Logger, Log} from "../../helpers/logger";
+import {Promises} from "../../utils/promises";
 
 export class EventCollection extends Collection {
     public tableName: string = "events";
@@ -19,17 +20,22 @@ export class EventCollection extends Collection {
     public log:Log;
     @Bound
     private onItemRemove(model:Event){
-        this.db.store.run(
-            `DELETE FROM customers where id in (SELECT customer_id FROM relations WHERE event_id=${model.getId()})`
-        ).then(r=>{
-            this.db.store.run(
-                sql.delete()
+        Promises.chain([
+            ()=>{
+                return this.db.store.run(
+                    `DELETE FROM customers where id in (SELECT customer_id FROM relations WHERE event_id=${model.getId()} AND finished=0)`
+                )
+            },
+            ()=>{
+                return this.db.store.run(sql
+                    .delete()
                     .from('relations')
                     .where('event_id = ?',model.getId())
                     .toString()
-            ).then(r=>{
-                this.log.info('DELETED',model.toJSON());
-            },this.log.error)
-        },this.log.error);
+                )
+            }
+        ]).then(r=>{
+            this.log.info('DELETED',model.toJSON());
+        }).catch(this.log.error);
     }
 }

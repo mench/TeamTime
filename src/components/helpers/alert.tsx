@@ -4,14 +4,14 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import {Bound} from "../../utils/bound";
 import WarningIcon from 'material-ui/svg-icons/action/report-problem';
-import {orange500} from 'material-ui/styles/colors';
+import {red500} from 'material-ui/styles/colors';
 
 export class Alert extends Component<any,any> {
     static defaultProps = {
         messages: [],
         open : false,
         onClose : e => {}
-    }
+    };
     state = {
         open: this.props.open
     };
@@ -44,10 +44,10 @@ export class Alert extends Component<any,any> {
                     open={this.state.open}
                     onRequestClose={this.handleClose}
                 >
-                     <WarningIcon color={orange500} /> <span style={{position:"relative",top:-5}}>Validation failed</span>
+                     <WarningIcon color={red500} /> <span style={{position:"relative",top:-5}}>Validation failed</span>
                     <ul>
                         {
-                            this.props.messages.map((m,i)=><li key={i} style={{marginTop:5,lineHeight: 1.3,color:orange500}}>{m}</li>)
+                            this.props.messages.map((m,i)=><li key={i} style={{marginTop:5,lineHeight: 1.3,color:red500}}>{m}</li>)
                         }
                     </ul>
 

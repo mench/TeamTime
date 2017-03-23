@@ -2,38 +2,44 @@ import {Other} from "./other";
 import {WEEKDAYS} from "../weekdays";
 
 export class Mafia extends Other {
-    protected start_time:Date;
-    protected end_time:Date;
-    protected totalPrice = 1000;
+    public start_time:Date;
+    public end_time:Date;
+    public totalPrice:number;
 
     constructor(){
         super();
         this.init();
     }
+    formatTime = d =>{
+        let date = new Date();
+        date.setHours(d.hours);
+        date.setMinutes(d.minutes);
+        return date;
+    };
+    get startTimeThursday(){
+        return this.formatTime(this.settings.data.mafia.THURSDAY.start_time);
+    }
+    get startTimeSunday(){
+        return this.formatTime(this.settings.data.mafia.SUNDAY.start_time);
+    }
+    get endTimeThursday(){
+        return this.formatTime(this.settings.data.mafia.THURSDAY.end_time);
+    }
+    get endTimeSunday(){
+        return this.formatTime(this.settings.data.mafia.SUNDAY.end_time);
+    }
     protected init(){
         let today = new Date().getDay();
         switch (today){
             case WEEKDAYS.THURSDAY :
-                //TODO must give from settings
-                var start_date = new Date();
-                start_date.setHours(19);
-                start_date.setMinutes(0);
-                var end_date = new Date();
-                end_date.setHours(22);
-                end_date.setMinutes(0);
-                this.start_time = start_date;
-                this.end_time = end_date;
+                this.start_time = this.startTimeThursday;
+                this.end_time = this.endTimeThursday;
+                this.totalPrice = this.settings.data.mafia.THURSDAY.totalPrice;
                 break;
             case WEEKDAYS.SUNDAY :
-                //TODO must give from settings
-                var start_date = new Date();
-                start_date.setHours(19);
-                start_date.setMinutes(0);
-                var end_date = new Date();
-                end_date.setHours(22);
-                end_date.setMinutes(0);
-                this.start_time = start_date;
-                this.end_time = end_date;
+                this.start_time = this.startTimeSunday;
+                this.end_time = this.endTimeSunday;
+                this.totalPrice = this.settings.data.mafia.SUNDAY.totalPrice;
                 break;
         }
     }
@@ -43,7 +49,7 @@ export class Mafia extends Other {
                 return this.totalPrice;
             }
             if( created_at > this.end_time ){
-                return this.totalPrice + super.price(this.end_time);
+                return this.totalPrice + super.price(this.end_time,true);
             }
             return 0;
         }

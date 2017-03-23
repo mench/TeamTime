@@ -4,6 +4,7 @@ import {Component,PropTypes} from 'react';
 import {Card, CardHeader ,CardText} from 'material-ui/Card';
 import {Bound} from "../../utils/bound";
 import TextField from 'material-ui/TextField';
+import NumberInput from 'material-ui-number-input';
 import RaisedButton from 'material-ui/RaisedButton';
 import {lightBlue500} from 'material-ui/styles/colors';
 import CircularProgress from 'material-ui/CircularProgress';
@@ -177,9 +178,10 @@ export class Events extends Component<any,any> {
                     />
                     <TimePicker  onChange ={this.handleEventStartTime} hintText="Start Time" defaultTime={new Date()} />
                     <TimePicker  onChange ={this.handleEventEndTime} hintText="End Time" />
-                    <TextField
+                    <NumberInput
                         onChange ={this.handleEventPrice}
                         hintText="Price"
+                        strategy="ignore"
                         floatingLabelText="Price"
                     />
                 </Dialog>
@@ -216,7 +218,7 @@ export class Event extends Other{
         if ( exist ){
             return this.handleError([
                 {
-                    message: `code ${model.code} already exist in the active list. Please finish and try again.`
+                    message: `code ${model.code} already exists in the active list. Please finish and try again.`
                 }
             ])
         }
@@ -236,7 +238,7 @@ export class Event extends Other{
     public handleDeleteEvent(){
         let event:EventModel = this.props.data;
         if( this.collection.length ){
-            confirm('Are you sure you wont to delete this event. There are unfinished items. All unfinished Customers will be removed').then(ok=> {
+            confirm('Are you sure you want to delete this event. There are unfinished items. All unfinished Customers will be removed').then(ok=> {
                     event.once('destroy',this.props.onDestroy);
                     event.destroy();
                 },r=>{}
@@ -253,7 +255,9 @@ export class Event extends Other{
             .select(sql
                 .select()
                 .field("count(*) as total")
+                .left_join('customers',null,'relations.customer_id = customers.id')
                 .where('event_id = ?',this.props.data.getId())
+                .where('customers.finished = 0')
             ).then(this.ready)
             .catch(System.app.log.error);
     }
@@ -268,15 +272,19 @@ export class Event extends Other{
             .field('event_id')
             .left_join('customers',null,'relations.customer_id = customers.id')
             .where('event_id = ?',this.props.data.getId())
+            .where('finished = 0')
             .offset(offset)
             .order(this.order,this.direction)
             .limit(this.state.rowSize)
         ).catch(System.app.log.error);
     }
     public appendItem(model:Customer){
+        model.calculator.start_time = this.props.data.start_time;
+        model.calculator.end_time = this.props.data.end_time;
+        model.calculator.totalPrice = this.props.data.price;
         let object:any = model.toObject();
         Object.defineProperty(object,'action',{
-            value :  <RaisedButton label="FINISH" secondary={true} />
+            value :  <RaisedButton label="FINISH" onTouchTap={()=>this.handleFinish(model)} secondary={true} />
         });
         Object.defineProperty(object,'note',{
             value :<span>{object.note} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={this.handleEditNote.bind(this,object.id,object.note)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
@@ -285,6 +293,17 @@ export class Event extends Other{
             value :  <span style={{fontSize:11}}><b>{model.getShortCreatedAt()}</b></span>
         });
         return object;
+    }
+    public finished(price:number,model:Customer){
+        this.collection.remove(model);
+        model.set({
+            price:price,
+            finished_at:Date.now(),
+            finished : true
+        }).save().then(r=>{
+            this.log.info('FINISHED',model.id,model.code);
+            this.load(this.state.page);
+        }).catch(this.log.error);
     }
 
     public render(){
@@ -393,7 +412,6 @@ export class Event extends Other{
                                 ]}
                                 data={this.state.data}
                                 showCheckboxes={false}
-                                onFilterValueChange={this.handleFilterValueChange}
                                 onSortOrderChange={this.handleSortOrderChange}
                                 onNextPageClick = {this.handleNextPage}
                                 onPreviousPageClick = {this.handlePreviousPage}

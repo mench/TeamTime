@@ -69,7 +69,7 @@ export class Customer extends Model {
         return super.save(options);
     }
     @Cached
-    public get calculator(){
+    public get calculator():any{
         switch (CATEGORIES[this.category.toUpperCase()]){
             case CATEGORIES.MAFIA :
                 return new Mafia();
@@ -87,12 +87,22 @@ export class Customer extends Model {
     protected get sync():DbAdapter{
         return new DbAdapter(this,'customers');
     }
+    public getPrice(){
+        return this.calculator.price(this.created_at);
+    }
     public toObject(){
         let model = this.toJSON();
-        if( model.created_at && !this.finished){
+        if( model.created_at ){
             model.created_at = new Date(model.created_at)
                 .toString()
                 .replace(/GMT(.*)/g,"");
+        }
+        if( model.finished_at ){
+            model.finished_at = new Date(model.finished_at)
+                .toString()
+                .replace(/GMT(.*)/g,"");
+        }
+        if( !this.finished ){
             model.price = this.calculator.price(this.created_at);
         }
         return model;

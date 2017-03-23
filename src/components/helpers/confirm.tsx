@@ -3,7 +3,9 @@ import {Component} from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import WarningIcon from 'material-ui/svg-icons/action/report-problem';
+import SuccessIcon from 'material-ui/svg-icons/action/done';
 import {orange500} from 'material-ui/styles/colors';
+import {green500} from 'material-ui/styles/colors';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {lightBlue500} from 'material-ui/styles/colors';
@@ -50,10 +52,18 @@ class ConfirmDialog extends Component<any,any>{
                 open={this.state.open}
                 onRequestClose={this.handleClose}
             >
-                <WarningIcon color={orange500} /> <span style={{position:"relative",top:-5}}>Confirmation</span>
-                <p style={{color:orange500,lineHeight:1.5}}>
+                {
+                    (()=>{
+                      if( this.props.options.success ){
+                          return <SuccessIcon color={green500} />
+                      }
+                      return  <WarningIcon color={orange500} />
+                    })()
+                }
+                <span style={{position:"relative",top:-5}}>Confirmation</span>
+                <div style={{color:this.props.options.success ? green500 : orange500,lineHeight:1.5,margin:"1em"}}>
                     {this.props.confirmation}
-                </p>
+                </div>
 
             </Dialog>
         </MuiThemeProvider>
