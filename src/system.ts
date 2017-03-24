@@ -55,6 +55,9 @@ export class System {
         Promises.chain([
             ()=>{
                 return  this.database.start();
+            },
+            ()=>{
+                return  this.database.migrate();
             }
         ]).then(()=>{
             this.log.info("System Started");

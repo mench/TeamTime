@@ -121,7 +121,9 @@ export class Report extends Other {
             snackBar: false,
         });
     };
+    public runInterval(){
 
+    }
     render(){
         let state:any = this.state;
         return (

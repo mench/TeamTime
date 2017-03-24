@@ -1,6 +1,6 @@
 {
   "name": "TeamTime",
-  "main": "out/system.js",
+  "main": "app.js",
   "types": "out/system.d.ts",
   "version": "1.0.0",
   "author": "Armen Harutyunyan <mench.harutyunyan@gmail.com>",
@@ -8,7 +8,9 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "start-local": "NODE_ENV=local ./node_modules/.bin/electron ./app.js",
-    "start": "NODE_ENV=production ./node_modules/.bin/electron ./app.js"
+    "start": "NODE_ENV=production ./node_modules/.bin/electron ./app.js",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=teamtime.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --icon=teamtime.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Electron Tutorial App\""
   },
   "dependencies": {
     "@types/material-ui": "^0.16.57",
@@ -34,7 +36,8 @@
   },
   "devDependencies": {
     "electron": "1.6.2",
-    "electron-builder": "^14.5.2"
+    "electron-builder": "^14.5.2",
+    "electron-packager": "^8.6.0"
   },
   "description": "TeamTime Soft"
 }

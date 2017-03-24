@@ -12,6 +12,11 @@ export class DatabaseService extends Service {
     public connect():Promise<Database>{
         return sqlite.open(this.filename, { Promise });
     }
+    public migrate():Promise<any>{
+        return sqlite.migrate({
+            migrationsPath:path.resolve(__dirname,`../../../data/migrations`)
+        });
+    }
     protected get filename(){
         return path.resolve(__dirname,`../../../data/${this.config.database.name}`)
     };

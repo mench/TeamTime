@@ -26,6 +26,7 @@ export class Other extends Component<any,any>{
     protected categoryName = 'Other';
     protected order = 'created_at';
     protected direction = false;
+    protected loop = null;
     public static defaultProps = {
         onError : ()=>{}
     };
@@ -101,6 +102,17 @@ export class Other extends Component<any,any>{
     public get collection(){
         return new CustomerCollection();
     }
+    public runInterval(){
+        this.loop = setInterval(()=>{
+            this.collection.emit('tick');
+        },3000);
+        this.collection.on('tick',()=>this.onTick());
+    }
+    public onTick(){
+        this.setState({
+            data : this.collection.map(this.appendItem.bind(this))
+        });
+    }
     public componentDidMount(){
         this.collection.on('reset',this.handleReset.bind(this));
         this.collection.on('change',()=>{
@@ -108,7 +120,11 @@ export class Other extends Component<any,any>{
                 data : this.collection.map(this.appendItem.bind(this))
             });
         });
+        this.runInterval();
         this.load(this.state.page);
+    }
+    public componentWillUnmount(){
+        clearInterval(this.loop);
     }
     @Bound
     public ready(res){
@@ -163,7 +179,6 @@ export class Other extends Component<any,any>{
 
     public appendItem(model:Customer){
         let object:any = model.toObject();
-
         Object.defineProperty(object,'action',{
             value :  <RaisedButton label="FINISH" onTouchTap={()=>this.handleFinish(model)} secondary={true} />
         });
