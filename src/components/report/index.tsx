@@ -108,12 +108,21 @@ export class Report extends Other {
             fromDate:this.from_date,
             toDate:this.to_date
         }).then(data=>{
-            exporter.downloadCsv(data);
-            setTimeout(()=>{
+            if( data && data.length ){
+                exporter.downloadCsv(data);
+                setTimeout(()=>{
+                    this.setState({
+                        snackBar: true,
+                        snackBarMessage:"Report is exported. Check your Downloads folder"
+                    });
+                },2000)
+            }else{
                 this.setState({
                     snackBar: true,
+                    snackBarMessage:"There are no report to export"
                 });
-            },2000)
+            }
+
         }).catch(this.log.error);
     }
     handleRequestClose = () => {
@@ -220,7 +229,7 @@ export class Report extends Other {
                 </CardText>
                 <Snackbar
                     open={state.snackBar}
-                    message="Report is exported. Check your Downloads folder"
+                    message={state.snackBarMessage || ""}
                     autoHideDuration={5000}
                     onRequestClose={this.handleRequestClose}
                 />
