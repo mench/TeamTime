@@ -38,7 +38,10 @@ export class Customer extends Model {
     public note:string;
 
     @Field({
-        type:Number
+        type:Number,
+        set:function (key,value) {
+            return (value == '' || !value || value == null) ? 0 : value;
+        }
     })
     public price:number;
 

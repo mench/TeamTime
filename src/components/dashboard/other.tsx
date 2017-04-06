@@ -3,6 +3,7 @@ import {Component} from 'react';
 import {Card, CardHeader ,CardText} from 'material-ui/Card';
 import {Bound} from "../../utils/bound";
 import TextField from 'material-ui/TextField';
+import NumberInput from 'material-ui-number-input';
 import RaisedButton from 'material-ui/RaisedButton';
 import {lightBlue500} from 'material-ui/styles/colors';
 import {red500} from 'material-ui/styles/colors';
@@ -157,12 +158,21 @@ export class Other extends Component<any,any>{
             model.save();
         },r=>{});
     };
+    handleEditname (id,value){
+        let _id = id;
+        prompt(value).then(val=>{
+            let model = this.collection.get(_id);
+            model.set('name',val);
+            model.save();
+        },r=>{});
+    };
 
     public handleFinish(model:Customer){
         let price = model.getPrice();
-        confirm(<span><span>Total price is</span><h2>{price}<span style={{fontSize:12}}>&nbsp;AMD</span></h2></span>,{success:true})
+        confirm(<span><span>Total price is</span><h2><NumberInput defaultValue={price} id={`total-price-${model.id}`}  strategy="ignore" /><span style={{fontSize:12}}>&nbsp;AMD</span></h2></span>,{success:true})
             .then(r=>{
-                this.finished(price,model);
+                let input:any = document.getElementById(`total-price-${model.id}`);
+                this.finished(input.value,model);
             },e=>{});
     }
     public finished(price:number,model:Customer){
@@ -185,9 +195,13 @@ export class Other extends Component<any,any>{
         Object.defineProperty(object,'created_at',{
             value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
         });
-        var note = object.note;
+        let note = object.note;
         Object.defineProperty(object,'note',{
             value :<span>{object.note} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditNote(object.id,note)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+        });
+        let name = object.name;
+        Object.defineProperty(object,'name',{
+            value :<span>{object.name} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditname(object.id,name)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
         });
         return object;
     }

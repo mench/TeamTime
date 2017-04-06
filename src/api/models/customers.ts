@@ -16,14 +16,22 @@ export class CustomerCollection extends Collection {
             .toString()
         )
     }
-    public async search(value,{fromDate = null,toDate=null} = {},trigger = true){
+    public async search(value,{fromDate = null,toDate=null,category = null} = {},trigger = true){
         let addon = '';
         if( fromDate && toDate ){
-            addon+= `AND ( created_at BETWEEN CAST(${fromDate.getTime()} AS DATE ) AND CAST(${toDate.getTime()} AS DATE)  )`;
+            fromDate.setHours(0,0,0,0);
+            toDate.setHours(0,0,0,0);
+            addon+= `AND ( created_at >=${fromDate.getTime()} AND created_at <= ${toDate.getTime()}  )`;
         }else if( fromDate ) {
+            fromDate.setHours(0,0,0,0);
             addon+= `AND ( created_at >=${fromDate.getTime()} )`;
         }else if( toDate ){
-            addon+= `AND ( created_at <= ${toDate.getTime()} )`;
+            toDate.setHours(0,0,0,0);
+            addon+= `AND ( created_at <=${toDate.getTime()} )`;
+        }
+
+        if( category && category!=null && category!= ''){
+            addon+= `AND ( category ='${category}' )`;
         }
         if ( value && value!='' ){
             addon += `AND (
@@ -62,8 +70,12 @@ export class CustomerCollection extends Collection {
                 return {
                     CODE:e.code,
                     NAME:e.name,
-                    CREATED_AT:e.created_at,
-                    FINISHED_AT:e.finished_at,
+                    CREATED_AT:new Date(e.created_at)
+                        .toString()
+                        .replace(/GMT(.*)/g,""),
+                    FINISHED_AT:new Date(e.finished_at)
+                        .toString()
+                        .replace(/GMT(.*)/g,""),
                     NOTE:e.note,
                     PRICE:e.price,
                     CATEGORY:e.category

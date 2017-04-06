@@ -45,10 +45,14 @@ export class Mafia extends Other {
     }
     public price(created_at:Date):number{
         if( this.start_time && this.end_time ){
-            if( created_at >= this.start_time && created_at <= this.end_time ){
+            let now = new Date();
+            if( created_at > this.end_time ){
+                return super.price(created_at);
+            }
+            if( now >= this.start_time && now <= this.end_time ){
                 return this.totalPrice;
             }
-            if( created_at > this.end_time ){
+            if( now > this.end_time ){
                 return this.totalPrice + super.price(this.end_time,true);
             }
             return 0;

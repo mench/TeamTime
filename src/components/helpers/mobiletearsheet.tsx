@@ -31,10 +31,10 @@ export class MobileTearSheet extends Component<any,any>{
                 width: 360
             }
         };
-
+        let containerStyle:any = styles.container;
         return (
             <div style={styles.root}>
-                <div style={styles.container}>
+                <div style={containerStyle}>
                     {this.props.children}
                 </div>
                 <img style={styles.bottomTear} src="images/bottom-tear.svg" />

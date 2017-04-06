@@ -9,10 +9,15 @@ import {Bound} from "../../utils/bound";
 import DatePicker from 'material-ui/DatePicker';
 import ActionUpdateIcon from 'material-ui/svg-icons/action/update';
 import ActionExportIcon from 'material-ui/svg-icons/action/get-app';
+import DeleteIcon from 'material-ui/svg-icons/content/clear';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import {green300} from 'material-ui/styles/colors';
+import {red500} from 'material-ui/styles/colors';
 import Snackbar from 'material-ui/Snackbar';
+import {confirm} from "../helpers/confirm";
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 
 require('csvexport');
 let glob:any = window;
@@ -25,17 +30,26 @@ const {DataTables} =  require('material-ui-datatables');
 export class Report extends Other {
     private from_date:Date;
     private to_date;
+    private category;
     private value:string;
 
     constructor(props,ctx){
         super(props,ctx);
         this.rowSizeList = [100,150,250];
         this.state.rowSize = 100;
-        Object.defineProperty(this.state,'snackBar',{
-            enumerable:true,
-            configurable:true,
-            writable:true,
-            value:false
+        Object.defineProperties(this.state,{
+            snackBar:{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:false
+            },
+            categoryFilter:{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:null
+            }
         });
     }
     public appendItem(model:Customer){
@@ -47,6 +61,9 @@ export class Report extends Other {
         Object.defineProperty(object,'finished_at',{
             value :  <span style={{fontSize:11}}><b>{object.finished_at}</b></span>
         });
+        Object.defineProperty(object,'action',{
+            value :  <FlatButton  onTouchTap={()=>{ this.handleDelete(model); }} icon={<DeleteIcon color={red500} />} />
+        });
         return object;
     }
 
@@ -54,7 +71,8 @@ export class Report extends Other {
         this.collection
             .search(value ? value.trim() : null,{
                 fromDate:this.from_date,
-                toDate : this.to_date
+                toDate : this.to_date,
+                category:this.category
             }).then(r=>{
             setTimeout(()=>{
                 this.setState({
@@ -63,13 +81,19 @@ export class Report extends Other {
             })
         }).catch(this.log.error);
     };
-
+    @Bound
+    private handleDelete(model:Customer){
+        confirm("Are you sure you wont to delete this item?")
+            .then(ok=>{
+                model.destroy();
+            },e=>{})
+    }
     @Bound
     public handleFilterValueChange(value){
         this.value = value;
         if(value && value!=''){
             this.search(value);
-        }else if(this.from_date || this.to_date){
+        }else if(this.from_date || this.to_date || this.category){
             this.search(null);
         }else
         if( typeof value=='string' &&  value.trim() == '' ){
@@ -133,6 +157,20 @@ export class Report extends Other {
     public runInterval(){
 
     }
+    @Bound
+    private handleChangeFilterCategory(event, index, value){
+        this.category = value;
+        this.setState({
+            categoryFilter:value
+        });
+        this.search(this.value);
+    }
+    public componentDidMount(){
+        super.componentDidMount();
+        this.collection.on('remove',()=>{
+            this.collection.emit('reset');
+        });
+    }
     render(){
         let state:any = this.state;
         return (
@@ -156,6 +194,24 @@ export class Report extends Other {
                             icon={<ActionExportIcon />}
                             onTouchTap={this.handleExport}
                         />
+                    </div>
+                    <div style={{
+                            marginLeft: 17,
+                            float: 'left',
+                            clear: 'both'
+                        }}>
+                        <SelectField
+                            floatingLabelText="Filter By Category"
+                            value={state.categoryFilter}
+                            onChange={this.handleChangeFilterCategory}
+                        >
+                            <MenuItem value={null} primaryText={""} />
+                            {
+                                ['Mafia','Other','Event','Club','Package'].map(c=>{
+                                    return  <MenuItem key={c} value={c} primaryText={c} />
+                                })
+                            }
+                        </SelectField>
                     </div>
                     <div style={{clear:'both'}}></div>
                     {
@@ -207,6 +263,11 @@ export class Report extends Other {
                                         key: 'note',
                                         label: 'NOTE',
                                         sortable:true
+                                    },
+                                    {
+                                        key: 'action',
+                                        label: 'ACTION',
+                                        sortable:false
                                     }
                                 ]}
                                     data={this.state.data}
