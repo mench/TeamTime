@@ -52,19 +52,7 @@ export class System {
 
     public start(){
         this.log.info("System Starting");
-        Promises.chain([
-            ()=>{
-                return  this.database.start();
-            },
-            ()=>{
-                return  this.database.migrate();
-            }
-        ]).then(()=>{
-            this.log.info("System Started");
-            this.view.render();
-        }).catch(e=>{
-            this.log.error("System Rejected",e);
-        });
+        this.view.render();
     }
 }
 System.app.start();

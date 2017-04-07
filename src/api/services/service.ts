@@ -3,6 +3,4 @@ export abstract class Service {
 
     @Logger
     public log:Log;
-
-    public abstract async start();
 }

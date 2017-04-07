@@ -106,7 +106,7 @@ export class Report extends Other {
             .select(sql
                 .select()
                 .field("count(*) as total")
-                .where('finished = 1')
+                .where('finished = "true"')
             ).then(this.ready);
     }
 
@@ -116,7 +116,7 @@ export class Report extends Other {
         let offset =  ((page - 1) * this.state.rowSize);
         this.collection.fetch(sql
             .select()
-            .where('finished = 1')
+            .where('finished = "true"')
             .offset(offset)
             .order(this.order,this.direction)
             .limit(this.state.rowSize)

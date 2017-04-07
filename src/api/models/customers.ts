@@ -8,11 +8,11 @@ export class CustomerCollection extends Collection {
         super(Customer);
     }
     public async fetchByCode(code){
-        return await this.db.store.get(sql
+        return await this.db.get(sql
             .select()
             .from(this.tableName)
             .where('code = ?',code)
-            .where('finished = 0')
+            .where('finished = "false"')
             .toString()
         )
     }
@@ -46,12 +46,12 @@ export class CustomerCollection extends Collection {
                 price LIKE '%${Number(value)}%'
             )`;
         }
-        let res = await this.db.store.all(
+        let res = await this.db.all(
             `SELECT 
             * FROM 
             customers 
             WHERE
-            finished = 1
+            finished = "true"
             ${addon}`
         );
         if(Array.isArray(res)){
@@ -62,7 +62,6 @@ export class CustomerCollection extends Collection {
         }
         return false;
     }
-
     public async export(value,{fromDate = null,toDate=null} = {}){
         let res = await this.search(value,{fromDate:fromDate,toDate:toDate},false);
         if( res instanceof Array){

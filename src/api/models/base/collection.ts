@@ -23,10 +23,10 @@ export class Collection extends EcmaCollection implements SqlTrait{
         return new DbAdapter(this,this.tableName);
     }
     public select(sql):Promise<any>{
-        return this.db.store.get(sql.from(this.tableName).toString());
+        return this.db.get(sql.from(this.tableName).toString());
     }
     public async fetch(sql):Promise<false | this>{
-        let res = await this.db.store.all(
+        let res = await this.db.all(
             sql
                 .from(this.tableName)
                 .toString()

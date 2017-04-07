@@ -212,7 +212,7 @@ export class Other extends Component<any,any>{
                 .select()
                 .field("count(*) as total")
                 .where('category = ?',this.categoryName)
-                .where('finished = 0')
+                .where('finished = "false"')
             ).then(this.ready);
     }
     @Cached
@@ -226,7 +226,7 @@ export class Other extends Component<any,any>{
         this.collection.fetch(sql
             .select()
             .where('category = ?',this.categoryName)
-            .where('finished = 0')
+            .where('finished = "false"')
             .offset(offset)
             .order(this.order,this.direction)
             .limit(this.state.rowSize)

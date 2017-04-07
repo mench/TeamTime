@@ -15,17 +15,19 @@ export class DbAdapter extends SyncHttp {
         return System.app.database;
     }
     public async create():Promise<any>{
-        let {store} = this.db;
+        let store = this.db;
         let entity = this.entity.toJSON();
-        let res = await store.run.apply(store,[
-            (`INSERT INTO ${this.tableName} (${Object.keys(entity).join(',')}) VALUES(${Object.keys(entity).map(v=>'?').join(',')})`)
-        ].concat(Object.keys(entity).map(k=>entity[k]))).catch(e=>{
+        let res:any = await store.run(
+            (`  INSERT INTO ${this.tableName} (${Object.keys(entity).join(',')}) 
+                VALUES(${Object.keys(entity).map(v=>'?').join(',')})`
+            ),Object.keys(entity).map(k=>entity[k]))
+            .catch(e=>{
             System.app.log.error(e);
         });
         return await this.db.get(sql
             .select()
             .from(this.tableName)
-            .where('id = ?',res.stmt.lastID)
+            .where('id = ?',res.insertId)
             .toString()
         );
     }
@@ -39,22 +41,22 @@ export class DbAdapter extends SyncHttp {
             );
     }
     public async update():Promise<any>{
-        let {store} = this.db;
+        let store = this.db;
         let entity = this.entity.toJSON();
         delete entity.created_at;
         entity.updated_at = Date.now();
-        var id = entity.id;
+        let id = entity.id;
         delete entity.id;
-        return await store.run.apply(store,[
-            (`UPDATE ${this.tableName} SET ${Object.keys(entity).map(k=>`${k} = ?`).join(',')} WHERE id=?`)
-        ].concat(Object.keys(entity).map(k=>entity[k])).concat([id])).catch(e=>{
+        return await store.run(
+            (`UPDATE ${this.tableName} SET ${Object.keys(entity).map(k=>`${k} = ?`).join(',')} WHERE id=?`),
+            Object.keys(entity).map(k=>entity[k]).concat([id])).catch(e=>{
             System.app.log.error(e);
         }).then(r=>{
             return this.entity.toJSON();
         });
     }
     public async delete():Promise<any>{
-        let {store} = this.db;
+        let store = this.db;
         return await store.run(
             sql.delete()
                 .from(this.tableName)

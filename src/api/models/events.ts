@@ -22,12 +22,12 @@ export class EventCollection extends Collection {
     private onItemRemove(model:Event){
         Promises.chain([
             ()=>{
-                return this.db.store.run(
-                    `DELETE FROM customers where id in (SELECT customer_id FROM relations WHERE event_id=${model.getId()} AND finished=0)`
+                return this.db.run(
+                    `DELETE FROM customers where id in (SELECT customer_id FROM relations WHERE event_id=${model.getId()} AND finished="false")`
                 )
             },
             ()=>{
-                return this.db.store.run(sql
+                return this.db.run(sql
                     .delete()
                     .from('relations')
                     .where('event_id = ?',model.getId())

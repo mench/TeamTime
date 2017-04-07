@@ -272,7 +272,7 @@ export class Event extends Other{
             .field('event_id')
             .left_join('customers',null,'relations.customer_id = customers.id')
             .where('event_id = ?',this.props.data.getId())
-            .where('finished = 0')
+            .where('finished = "false"')
             .offset(offset)
             .order(this.order,this.direction)
             .limit(this.state.rowSize)
@@ -291,6 +291,10 @@ export class Event extends Other{
         });
         Object.defineProperty(object,'created_at',{
             value :  <span style={{fontSize:11}}><b>{model.getShortCreatedAt()}</b></span>
+        });
+        let name = object.name;
+        Object.defineProperty(object,'name',{
+            value :<span>{object.name} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditname(object.id,name)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
         });
         return object;
     }
