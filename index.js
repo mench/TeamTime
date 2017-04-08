@@ -1,1 +1,3 @@
-require('./out/system');
+setTimeout(function () {
+    require('./out/system');
+});

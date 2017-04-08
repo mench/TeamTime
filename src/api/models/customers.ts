@@ -83,4 +83,11 @@ export class CustomerCollection extends Collection {
         }
         return [];
     }
+    public totalPrice(){
+        let sum = 0;
+        this.each(c=>{
+            sum+=c.price;
+        });
+        return sum;
+    }
 }

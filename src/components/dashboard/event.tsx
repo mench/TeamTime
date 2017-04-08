@@ -301,6 +301,7 @@ export class Event extends Other{
     public finished(price:number,model:Customer){
         this.collection.remove(model);
         model.set({
+            real_price : model.getPrice(),
             price:price,
             finished_at:Date.now(),
             finished : true

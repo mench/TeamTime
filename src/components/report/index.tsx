@@ -18,6 +18,7 @@ import Snackbar from 'material-ui/Snackbar';
 import {confirm} from "../helpers/confirm";
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
 
 require('csvexport');
 let glob:any = window;
@@ -49,6 +50,12 @@ export class Report extends Other {
                 configurable:true,
                 writable:true,
                 value:null
+            },
+            currentSum:{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:0
             }
         });
     }
@@ -56,10 +63,10 @@ export class Report extends Other {
         let object:any = model.toObject();
 
         Object.defineProperty(object,'created_at',{
-            value :  <span style={{fontSize:11}}><b>{object.created_at}</b></span>
+            value :  <span style={{fontSize:10}}><b>{object.created_at}</b></span>
         });
         Object.defineProperty(object,'finished_at',{
-            value :  <span style={{fontSize:11}}><b>{object.finished_at}</b></span>
+            value :  <span style={{fontSize:10}}><b>{object.finished_at}</b></span>
         });
         Object.defineProperty(object,'action',{
             value :  <FlatButton  onTouchTap={()=>{ this.handleDelete(model); }} icon={<DeleteIcon color={red500} />} />
@@ -213,6 +220,18 @@ export class Report extends Other {
                             }
                         </SelectField>
                     </div>
+                    <div style={{
+                            marginLeft: 17,
+                            float: 'left',
+                            clear: 'both'
+                        }}>
+                        <TextField
+                            hintText="Current Sum"
+                            value = {state.currentSum}
+                            floatingLabelText="Current Sum"
+                            disabled = {true}
+                        />
+                    </div>
                     <div style={{clear:'both'}}></div>
                     {
                         (()=>{
@@ -250,8 +269,13 @@ export class Report extends Other {
                                         sortable:true
                                     },
                                     {
-                                        key: 'price',
+                                        key: 'real_price',
                                         label: 'PRICE',
+                                        sortable:true
+                                    },
+                                    {
+                                        key: 'price',
+                                        label: 'PAYED',
                                         sortable:true
                                     },
                                     {

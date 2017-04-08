@@ -106,7 +106,7 @@ export class Other extends Component<any,any>{
     public runInterval(){
         this.loop = setInterval(()=>{
             this.collection.emit('tick');
-        },3000);
+        },5000);
         this.collection.on('tick',()=>this.onTick());
     }
     public onTick(){
@@ -132,6 +132,7 @@ export class Other extends Component<any,any>{
         let state = {
             ready : true,
             total:res.total,
+            currentSum:this.collection.totalPrice(),
             fields  : {
                 code:"",
                 name:"",
@@ -178,6 +179,7 @@ export class Other extends Component<any,any>{
     public finished(price:number,model:Customer){
         this.collection.remove(model);
         model.set({
+            real_price : model.getPrice(),
             price:price,
             finished_at:Date.now(),
             finished : true

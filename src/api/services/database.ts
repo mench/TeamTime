@@ -17,6 +17,7 @@ export class DatabaseService extends Service {
                     name TEXT,
                     note TEXT,
                     price REAL,
+                    real_price REAL,
                     category TEXT,
                     created_at INTEGER,
                     updated_at INTEGER,

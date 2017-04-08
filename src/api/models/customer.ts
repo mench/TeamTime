@@ -41,9 +41,20 @@ export class Customer extends Model {
         type:Number,
         set:function (key,value) {
             return (value == '' || !value || value == null) ? 0 : value;
+        },
+        get : function (value) {
+            return (value == '' || !value || value == null || isNaN(value)) ? 0 : value
         }
     })
     public price:number;
+
+    @Field({
+        type:Number,
+        set:function (key,value) {
+            return (value == '' || !value || value == null) ? 0 : value;
+        }
+    })
+    public real_price:number;
 
     @Field({
         type:String,
