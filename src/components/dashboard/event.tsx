@@ -294,7 +294,11 @@ export class Event extends Other{
         });
         let name = object.name;
         Object.defineProperty(object,'name',{
-            value :<span>{object.name} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditname(object.id,name)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+            value :<span>{object.name} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditName(object.id,name)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+        });
+        let phone = object.phone;
+        Object.defineProperty(object,'phone',{
+            value :<span>{object.phone} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditPhone(object.id,phone)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
         });
         return object;
     }
@@ -353,14 +357,21 @@ export class Event extends Other{
                             floatingLabelText="Customer Code"
                         />
                         <TextField
-                            style={{width:'25%',marginLeft:'2%'}}
+                            style={{width:'20%',marginLeft:'2%'}}
                             hintText="Name"
                             value = {this.state.fields.name}
                             onChange={this.handleNameChange}
                             floatingLabelText="Customer Name"
                         />
                         <TextField
-                            style={{width:'30%',marginLeft:'2%'}}
+                            style={{width:'15%',marginLeft:'2%'}}
+                            hintText="Phone Number"
+                            value = {this.state.fields.phone}
+                            onChange={this.handlePhoneChange}
+                            floatingLabelText="Phone Number"
+                        />
+                        <TextField
+                            style={{width:'20%',marginLeft:'2%'}}
                             hintText="Note"
                             value = {this.state.fields.note}
                             onChange={this.handleNoteChange}
@@ -402,6 +413,11 @@ export class Event extends Other{
                                     {
                                         key: 'price',
                                         label: 'PRICE',
+                                        sortable:false
+                                    },
+                                    {
+                                        key: 'phone',
+                                        label: 'PHONE',
                                         sortable:false
                                     },
                                     {

@@ -33,6 +33,12 @@ export class Customer extends Model {
     public name:string;
 
     @Field({
+        type:String,
+        trim:true
+    })
+    public phone:string;
+
+    @Field({
         type:String
     })
     public note:string;

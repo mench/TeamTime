@@ -42,6 +42,7 @@ export class Other extends Component<any,any>{
         fields  : {
             code:"",
             name:"",
+            phone:"",
             note:"",
             category:this.categoryName
         }
@@ -83,6 +84,13 @@ export class Other extends Component<any,any>{
     @Bound
     public handleNameChange(e){
         this.state.fields.name = e.target.value;
+        this.setState({
+            fields:this.state.fields
+        })
+    }
+    @Bound
+    public handlePhoneChange(e){
+        this.state.fields.phone = e.target.value;
         this.setState({
             fields:this.state.fields
         })
@@ -136,7 +144,8 @@ export class Other extends Component<any,any>{
             fields  : {
                 code:"",
                 name:"",
-                note:""
+                note:"",
+                phone:""
             },
             data : this.collection
                 .map(this.appendItem.bind(this))
@@ -159,11 +168,19 @@ export class Other extends Component<any,any>{
             model.save();
         },r=>{});
     };
-    handleEditname (id,value){
+    handleEditName (id,value){
         let _id = id;
         prompt(value).then(val=>{
             let model = this.collection.get(_id);
             model.set('name',val);
+            model.save();
+        },r=>{});
+    };
+    handleEditPhone (id,value){
+        let _id = id;
+        prompt(value).then(val=>{
+            let model = this.collection.get(_id);
+            model.set('phone',val);
             model.save();
         },r=>{});
     };
@@ -203,7 +220,11 @@ export class Other extends Component<any,any>{
         });
         let name = object.name;
         Object.defineProperty(object,'name',{
-            value :<span>{object.name} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditname(object.id,name)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+            value :<span>{object.name} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditName(object.id,name)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
+        });
+        let phone = object.phone;
+        Object.defineProperty(object,'phone',{
+            value :<span>{object.phone} <div style={{float:'right'}}><a href="javascript:;" data-id={object.id} onClick={()=>this.handleEditPhone(object.id,phone)}><EditIcon viewBox = {'0 0 35 10'} /></a></div></span>
         });
         return object;
     }
@@ -268,14 +289,21 @@ export class Other extends Component<any,any>{
                             floatingLabelText="Customer Code"
                         />
                         <TextField
-                            style={{width:'25%',marginLeft:'2%'}}
+                            style={{width:'15%',marginLeft:'2%'}}
                             hintText="Name"
                             value = {this.state.fields.name}
                             onChange={this.handleNameChange}
                             floatingLabelText="Customer Name"
                         />
                         <TextField
-                            style={{width:'30%',marginLeft:'2%'}}
+                            style={{width:'15%',marginLeft:'2%'}}
+                            hintText="Phone Number"
+                            value = {this.state.fields.phone}
+                            onChange={this.handlePhoneChange}
+                            floatingLabelText="Phone Number"
+                        />
+                        <TextField
+                            style={{width:'25%',marginLeft:'2%'}}
                             hintText="Note"
                             value = {this.state.fields.note}
                             onChange={this.handleNoteChange}
@@ -313,6 +341,11 @@ export class Other extends Component<any,any>{
                                     {
                                         key: 'price',
                                         label: 'PRICE',
+                                        sortable:false
+                                    },
+                                    {
+                                        key: 'phone',
+                                        label: 'PHONE',
                                         sortable:false
                                     },
                                     {

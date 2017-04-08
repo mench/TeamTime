@@ -63,10 +63,10 @@ export class Report extends Other {
         let object:any = model.toObject();
 
         Object.defineProperty(object,'created_at',{
-            value :  <span style={{fontSize:10}}><b>{object.created_at}</b></span>
+            value :  <span style={{fontSize:9}}><b>{object.created_at}</b></span>
         });
         Object.defineProperty(object,'finished_at',{
-            value :  <span style={{fontSize:10}}><b>{object.finished_at}</b></span>
+            value :  <span style={{fontSize:9}}><b>{object.finished_at}</b></span>
         });
         Object.defineProperty(object,'action',{
             value :  <FlatButton  onTouchTap={()=>{ this.handleDelete(model); }} icon={<DeleteIcon color={red500} />} />
@@ -281,6 +281,11 @@ export class Report extends Other {
                                     {
                                         key: 'category',
                                         label: 'CATEGORY',
+                                        sortable:true
+                                    },
+                                    {
+                                        key: 'phone',
+                                        label: 'PHONE',
                                         sortable:true
                                     },
                                     {
