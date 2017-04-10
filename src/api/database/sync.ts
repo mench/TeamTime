@@ -17,6 +17,15 @@ export class DbAdapter extends SyncHttp {
     public async create():Promise<any>{
         let store = this.db;
         let entity = this.entity.toJSON();
+        if( entity.created_at ){
+            entity.created_at = new Date(entity.created_at).getTime();
+        }
+        if( entity.updated_at ){
+            entity.updated_at = new Date(entity.updated_at).getTime();
+        }
+        if( entity.finished_at ){
+            entity.finished_at = new Date(entity.finished_at).getTime();
+        }
         let res:any = await store.run(
             (`  INSERT INTO ${this.tableName} (${Object.keys(entity).join(',')}) 
                 VALUES(${Object.keys(entity).map(v=>'?').join(',')})`

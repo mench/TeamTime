@@ -257,7 +257,7 @@ export class Event extends Other{
                 .field("count(*) as total")
                 .left_join('customers',null,'relations.customer_id = customers.id')
                 .where('event_id = ?',this.props.data.getId())
-                .where('customers.finished = 0')
+                .where('customers.finished = "false"')
             ).then(this.ready)
             .catch(System.app.log.error);
     }

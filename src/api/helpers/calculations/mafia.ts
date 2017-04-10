@@ -29,9 +29,12 @@ export class Mafia extends Other {
         return this.formatTime(this.settings.data.mafia.SUNDAY.end_time);
     }
     protected init(){
-        let today = new Date().getDay();
+
+    }
+    protected createTimestamp(created_at:Date){
+        let today = created_at.getDay();
         switch (today){
-            case WEEKDAYS.THURSDAY :
+            case WEEKDAYS.MONDAY :
                 this.start_time = this.startTimeThursday;
                 this.end_time = this.endTimeThursday;
                 this.totalPrice = this.settings.data.mafia.THURSDAY.totalPrice;
@@ -44,6 +47,7 @@ export class Mafia extends Other {
         }
     }
     public price(created_at:Date):number{
+        this.createTimestamp(created_at);
         if( this.start_time && this.end_time ){
             let now = new Date();
             if( created_at > this.end_time ){

@@ -11,4 +11,7 @@ export class Event extends Mafia {
         this.start_time = start_date;
         this.end_time = end_date;
     }
+    protected createTimestamp(created_at:Date){
+
+    }
 }
