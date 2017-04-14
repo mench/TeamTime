@@ -187,7 +187,7 @@ export class Other extends Component<any,any>{
 
     public handleFinish(model:Customer){
         let price = model.getPrice();
-        confirm(<span><span>Total price is</span><h2><NumberInput defaultValue={price} id={`total-price-${model.id}`}  strategy="ignore" /><span style={{fontSize:12}}>&nbsp;AMD</span></h2></span>,{success:true})
+        confirm(<span><span>Total price is</span><h2><NumberInput defaultValue={price} id={`total-price-${model.id}`}  strategy="ignore" /><span style={{fontSize:12}}>&nbsp;AMD</span></h2><h4>Started At&nbsp;&nbsp;{model.getShortCreatedAt()}</h4></span>,{success:true})
             .then(r=>{
                 let input:any = document.getElementById(`total-price-${model.id}`);
                 this.finished(input.value,model);

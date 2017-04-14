@@ -19,6 +19,9 @@ import {confirm} from "../helpers/confirm";
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
+import EditIcon from 'material-ui/svg-icons/image/edit';
+import NumberInput from 'material-ui-number-input';
+import Dialog from 'material-ui/Dialog';
 
 require('csvexport');
 let glob:any = window;
@@ -56,6 +59,70 @@ export class Report extends Other {
                 configurable:true,
                 writable:true,
                 value:0
+            },
+            requiredName:{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:""
+            },
+            requiredPayed:{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:""
+            },
+            changedData :{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:{}
+            },
+            modal :{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:(<div></div>)
+            },
+            openModal :{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:false
+            },
+            modalData:{
+                enumerable:true,
+                configurable:true,
+                writable:true,
+                value:{
+                    name:"",
+                    note:"",
+                    price:"",
+                    phone:""
+                }
+            }
+        });
+    }
+    handleChangeField = (key,value) =>{
+        let state:any = this.state;
+        state.changedData[key] = value;
+    };
+    @Bound
+    private handleEdit(model:Customer){
+        this.setState({
+            openModal:true,
+            modalData:{
+                model:model,
+                name:model.name,
+                price:model.price,
+                note:model.note,
+                phone:model.phone
+            },
+            changedData:{
+                name:model.name,
+                price:model.price,
+                note:model.note,
+                phone:model.phone
             }
         });
     }
@@ -69,7 +136,12 @@ export class Report extends Other {
             value :  <span style={{fontSize:9}}><b>{object.finished_at}</b></span>
         });
         Object.defineProperty(object,'action',{
-            value :  <FlatButton  onTouchTap={()=>{ this.handleDelete(model); }} icon={<DeleteIcon color={red500} />} />
+            value :  (
+                <div>
+                    <FlatButton style={{width:35,minWidth:35}}  onTouchTap={()=>{ this.handleEdit(model); }}  icon={<EditIcon />} />
+                    <FlatButton style={{width:35,minWidth:35}} onTouchTap={()=>{ this.handleDelete(model); }} icon={<DeleteIcon color={red500} />} />
+                </div>
+            )
         });
         return object;
     }
@@ -178,8 +250,53 @@ export class Report extends Other {
             this.collection.emit('reset');
         });
     }
+    handleCloseModal  = () => {
+        this.setState({openModal: false});
+    };
+    handleAcceptModal = ()=>{
+        let state:any = this.state;
+        let error = false;
+
+        if( state.changedData ){
+            if( !state.changedData.name || ( typeof state.changedData.name =='string' && state.changedData.name.trim() == '') ){
+                error = true;
+                this.setState({
+                    requiredName:'This field is required'
+                })
+            }
+            if( !state.changedData.price || ( typeof state.changedData.price =='string' && state.changedData.price.trim() == '') ){
+               error = true;
+               this.setState({
+                    requiredPayed:'This field is required'
+                })
+            }
+            if( !error ){
+                state.modalData.model.set(state.changedData).save();
+                this.setState({
+                    requiredPayed:"",
+                    requiredName: "",
+                    openModal: false
+                });
+            }
+
+        }else{
+            this.setState({openModal: false});
+        }
+    };
     render(){
         let state:any = this.state;
+        const actions = [
+            <FlatButton
+                label="Cancel"
+                primary={true}
+                onTouchTap={this.handleCloseModal}
+            />,
+            <FlatButton
+                label="Ok"
+                primary={true}
+                onTouchTap={this.handleAcceptModal}
+            />
+        ];
         return (
             <Card style={{margin: 40}}>
                 <CardHeader
@@ -323,6 +440,52 @@ export class Report extends Other {
                     autoHideDuration={5000}
                     onRequestClose={this.handleRequestClose}
                 />
+                <Dialog
+                    actions={actions}
+                    modal={false}
+                    contentStyle={{width:'40%'}}
+                    open={state.openModal}
+                    onRequestClose={this.handleCloseModal}
+                >
+                    <div style={{lineHeight:1.5,margin:"1em"}}>
+                        {(()=>{
+                            if(state.openModal){
+                                return (
+                                    <div>
+                                        <TextField
+                                            hintText="Name"
+                                            defaultValue = {state.modalData.name}
+                                            onChange={(e:any)=>{ this.handleChangeField('name',e.target.value) }}
+                                            errorText={state.requiredName}
+                                            floatingLabelText="Name"
+                                        />
+                                        <TextField
+                                            hintText="Phone"
+                                            defaultValue = {state.modalData.phone}
+                                            onChange={(e:any)=>{ this.handleChangeField('phone',e.target.value) }}
+                                            floatingLabelText="Phone"
+                                        />
+                                        <NumberInput
+                                            hintText="Payed"
+                                            strategy="ignore"
+                                            defaultValue = {state.modalData.price}
+                                            errorText={state.requiredPayed}
+                                            onChange={(e:any)=>{ this.handleChangeField('price',e.target.value) }}
+                                            floatingLabelText="Payed"
+                                        />
+                                        <TextField
+                                            hintText="Note"
+                                            defaultValue = {state.modalData.note}
+                                            onChange={(e:any)=>{ this.handleChangeField('note',e.target.value) }}
+                                            floatingLabelText="Note"
+                                        />
+                                    </div>
+                                )
+                            }
+                            return <div></div>
+                        })()}
+                    </div>
+                </Dialog>
             </Card>
         )
     }
