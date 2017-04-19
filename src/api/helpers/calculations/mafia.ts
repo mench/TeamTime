@@ -10,23 +10,24 @@ export class Mafia extends Other {
         super();
         this.init();
     }
-    formatTime = d =>{
-        let date = new Date();
-        date.setHours(d.hours);
-        date.setMinutes(d.minutes);
+    formatTime = (created_at:Date,opt:any) =>{
+        let date = new Date(created_at.getTime());
+        date.setHours(opt.hours);
+        date.setMinutes(opt.minutes);
+        date.setSeconds(0);
         return date;
     };
-    get startTimeThursday(){
-        return this.formatTime(this.settings.data.mafia.THURSDAY.start_time);
+    startTimeThursday(created_at:Date){
+        return this.formatTime(created_at,this.settings.data.mafia.THURSDAY.start_time);
     }
-    get startTimeSunday(){
-        return this.formatTime(this.settings.data.mafia.SUNDAY.start_time);
+    startTimeSunday(created_at:Date){
+        return this.formatTime(created_at,this.settings.data.mafia.SUNDAY.start_time);
     }
-    get endTimeThursday(){
-        return this.formatTime(this.settings.data.mafia.THURSDAY.end_time);
+    endTimeThursday(created_at:Date){
+        return this.formatTime(created_at,this.settings.data.mafia.THURSDAY.end_time);
     }
-    get endTimeSunday(){
-        return this.formatTime(this.settings.data.mafia.SUNDAY.end_time);
+    endTimeSunday(created_at:Date){
+        return this.formatTime(created_at,this.settings.data.mafia.SUNDAY.end_time);
     }
     protected init(){
 
@@ -34,14 +35,14 @@ export class Mafia extends Other {
     protected createTimestamp(created_at:Date){
         let today = created_at.getDay();
         switch (today){
-            case WEEKDAYS.THURSDAY :
-                this.start_time = this.startTimeThursday;
-                this.end_time = this.endTimeThursday;
+            case WEEKDAYS.WEDNESDAY :
+                this.start_time = this.startTimeThursday(created_at);
+                this.end_time = this.endTimeThursday(created_at);
                 this.totalPrice = this.settings.data.mafia.THURSDAY.totalPrice;
                 break;
             case WEEKDAYS.SUNDAY :
-                this.start_time = this.startTimeSunday;
-                this.end_time = this.endTimeSunday;
+                this.start_time = this.startTimeSunday(created_at);
+                this.end_time = this.endTimeSunday(created_at);
                 this.totalPrice = this.settings.data.mafia.SUNDAY.totalPrice;
                 break;
         }
