@@ -35,7 +35,7 @@ export class Mafia extends Other {
     protected createTimestamp(created_at:Date){
         let today = created_at.getDay();
         switch (today){
-            case WEEKDAYS.WEDNESDAY :
+            case WEEKDAYS.THURSDAY :
                 this.start_time = this.startTimeThursday(created_at);
                 this.end_time = this.endTimeThursday(created_at);
                 this.totalPrice = this.settings.data.mafia.THURSDAY.totalPrice;
